@@ -33,4 +33,11 @@ class Profile {
   final Map<String, dynamic> onboardingAnswers;
 
   bool get hasCompletedOnboarding => onboardingAnswers.isNotEmpty;
+
+  /// [displayName] with a graceful fallback for accounts created before a
+  /// preferred name was required at sign-up (migration 0002) — those rows
+  /// still have `display_name = null`. Use this anywhere a name is needed
+  /// to actually do something (e.g. snapshotting onto a community
+  /// post/comment); don't silently no-op just because it's missing.
+  String get effectiveDisplayName => displayName ?? email?.split('@').first ?? 'A member';
 }

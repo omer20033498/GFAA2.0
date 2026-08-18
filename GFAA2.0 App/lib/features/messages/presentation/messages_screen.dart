@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/relative_date.dart';
+import '../../../core/widgets/filter_tabs.dart';
 import '../application/message_providers.dart';
 import '../data/message_with_state.dart';
 import 'message_actions_row.dart';
@@ -31,7 +32,12 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
-                child: _FilterTabs(selected: _filter, onChanged: (filter) => setState(() => _filter = filter)),
+                child: FilterTabs<MessageFilter>(
+                  options: MessageFilter.values,
+                  labelOf: (filter) => filter.label,
+                  selected: _filter,
+                  onChanged: (filter) => setState(() => _filter = filter),
+                ),
               ),
               Expanded(
                 child: messagesAsync.when(
@@ -57,56 +63,6 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen> {
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterTabs extends StatelessWidget {
-  const _FilterTabs({required this.selected, required this.onChanged});
-
-  final MessageFilter selected;
-  final ValueChanged<MessageFilter> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        for (final filter in MessageFilter.values) ...[
-          _FilterChip(label: filter.label, selected: filter == selected, onTap: () => onChanged(filter)),
-          const SizedBox(width: 8),
-        ],
-      ],
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({required this.label, required this.selected, required this.onTap});
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(999),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.deepGreen : AppColors.coolWhite,
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: selected ? AppColors.offWhite : AppColors.nearBlack,
           ),
         ),
       ),

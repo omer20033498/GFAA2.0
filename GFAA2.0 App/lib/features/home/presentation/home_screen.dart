@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/widgets/home_menu_row.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../checkins/presentation/checkins_screen.dart';
+import '../../community/presentation/community_screen.dart';
 import '../../journal/presentation/journal_list_screen.dart';
 import '../../messages/presentation/latest_message_card.dart';
 import '../../messages/presentation/messages_screen.dart';
@@ -54,6 +55,14 @@ class HomeScreen extends ConsumerWidget {
               label: 'Check-ins',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const CheckinsScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeMenuRow(
+              icon: Icons.groups_outlined,
+              label: 'Community',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CommunityScreen()),
               ),
             ),
             const SizedBox(height: 10),

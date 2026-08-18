@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gfaa/features/auth/data/profile.dart';
 import 'package:gfaa/features/auth/presentation/login_screen.dart';
 import 'package:gfaa/features/checkins/data/mood.dart';
+import 'package:gfaa/features/community/data/community_post.dart';
+import 'package:gfaa/features/community/presentation/community_compose_screen.dart';
 import 'package:gfaa/features/journal/presentation/journal_entry_screen.dart';
 import 'package:gfaa/features/messages/data/daily_message.dart';
 import 'package:gfaa/features/messages/data/message_with_state.dart';
@@ -43,6 +46,52 @@ void main() {
 
     expect(find.text('New entry'), findsOneWidget);
     expect(find.text("Write what's on your mind..."), findsOneWidget);
+  });
+
+  testWidgets('CommunityComposeScreen renders a new-post composer', (tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(home: CommunityComposeScreen()),
+      ),
+    );
+
+    expect(find.text('New post'), findsOneWidget);
+    expect(find.text('Share something with the group…'), findsOneWidget);
+  });
+
+  group('Profile.effectiveDisplayName', () {
+    Profile profile({String? displayName, String? email}) => Profile(
+          id: 'u1',
+          role: 'user',
+          email: email,
+          displayName: displayName,
+          fullName: null,
+          onboardingAnswers: const {},
+        );
+
+    test('uses displayName when set', () {
+      expect(
+        profile(displayName: 'Sam', email: 'sam@example.com').effectiveDisplayName,
+        'Sam',
+      );
+    });
+
+    test('falls back to the email prefix when displayName is null', () {
+      expect(
+        profile(displayName: null, email: 'sam@example.com').effectiveDisplayName,
+        'sam',
+      );
+    });
+
+    test('falls back to "A member" when both are null', () {
+      expect(profile(displayName: null, email: null).effectiveDisplayName, 'A member');
+    });
+  });
+
+  test('PostStatus.fromKey round-trips every status key stored in the database', () {
+    for (final status in PostStatus.values) {
+      expect(PostStatus.fromKey(status.name), status);
+    }
   });
 
   test('Mood.fromKey round-trips every mood key stored in the database', () {

@@ -202,8 +202,11 @@ the ™ symbol below 8pt.
 - `user_messages` (id, user_id, message_id, saved, favourited, shared_at)
 - `journal_entries` (id, user_id, body, created_at, updated_at) — RLS: owner-only
 - `checkins` (id, user_id, mood, note, created_at)
-- `community_posts` (id, author_id, body, status [pending/approved/rejected], created_at)
-- `community_comments` (id, post_id, author_id, body, created_at)
+- `community_posts` (id, author_id, author_display_name, body, status
+  [pending/approved/rejected], created_at) — status is set server-side by a
+  trigger based on the author's role, not by the client
+- `community_comments` (id, post_id, author_id, author_display_name, body,
+  created_at)
 - `resources` (id, title, type [article/video], url_or_storage_path, category, created_at)
 - `practitioners` (id, user_id, name, profession, qualifications, expertise[],
   state, location, delivery_options[], phone, email, website, status
