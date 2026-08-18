@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../journal/presentation/journal_list_screen.dart';
 import '../../training/presentation/training_screen.dart';
 
 /// The `user`-role home. Deliberately minimal — a menu of feature entry
@@ -28,6 +29,14 @@ class HomeScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            _HomeMenuRow(
+              icon: Icons.edit_note,
+              label: 'Journal',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const JournalListScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
             _HomeMenuRow(
               icon: Icons.school_outlined,
               label: 'Training',
