@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/relative_date.dart';
 import '../application/journal_providers.dart';
 import '../data/journal_entry.dart';
-import '../journal_date_format.dart';
 import 'journal_entry_screen.dart';
 
 class JournalListScreen extends ConsumerWidget {
@@ -103,7 +103,7 @@ class _JournalEntryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                formatEntryDate(entry.createdAt),
+                formatRelativeDate(entry.createdAt),
                 style: textTheme.labelSmall,
               ),
               const SizedBox(height: 4),

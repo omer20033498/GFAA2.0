@@ -4,7 +4,7 @@ const _months = [
 
 /// "Today" / "Yesterday" / "Aug 15" / "Aug 15, 2025" — no `intl` dependency
 /// for a label this small.
-String formatEntryDate(DateTime dateTime) {
+String formatRelativeDate(DateTime dateTime) {
   final now = DateTime.now();
   final local = dateTime.toLocal();
 

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/relative_date.dart';
 import '../../auth/application/auth_providers.dart';
 import '../application/journal_providers.dart';
 import '../data/journal_entry.dart';
-import '../journal_date_format.dart';
 
 enum _LeaveAction { discard, save }
 
@@ -165,7 +165,7 @@ class _JournalEntryScreenState extends ConsumerState<JournalEntryScreen> {
             onPressed: _isBusy ? null : _handleBack,
           ),
           title: Text(
-            entry == null ? 'New entry' : formatEntryDate(entry.createdAt),
+            entry == null ? 'New entry' : formatRelativeDate(entry.createdAt),
             style: Theme.of(context).textTheme.titleMedium,
           ),
           actions: [

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gfaa/features/auth/presentation/login_screen.dart';
+import 'package:gfaa/features/checkins/data/mood.dart';
 import 'package:gfaa/features/journal/presentation/journal_entry_screen.dart';
 import 'package:gfaa/features/training/presentation/training_screen.dart';
 
@@ -39,5 +40,16 @@ void main() {
 
     expect(find.text('New entry'), findsOneWidget);
     expect(find.text("Write what's on your mind..."), findsOneWidget);
+  });
+
+  test('Mood.fromKey round-trips every mood key stored in the database', () {
+    for (final mood in Mood.values) {
+      expect(Mood.fromKey(mood.key), mood);
+    }
+  });
+
+  test('Mood levels are 1-5 and strictly increasing struggling to great', () {
+    final levels = Mood.values.map((mood) => mood.level).toList();
+    expect(levels, [1, 2, 3, 4, 5]);
   });
 }

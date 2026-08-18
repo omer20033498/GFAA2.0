@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../checkins/presentation/checkins_screen.dart';
 import '../../journal/presentation/journal_list_screen.dart';
 import '../../training/presentation/training_screen.dart';
 
@@ -34,6 +35,14 @@ class HomeScreen extends ConsumerWidget {
               label: 'Journal',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const JournalListScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _HomeMenuRow(
+              icon: Icons.mood_outlined,
+              label: 'Check-ins',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const CheckinsScreen()),
               ),
             ),
             const SizedBox(height: 10),
