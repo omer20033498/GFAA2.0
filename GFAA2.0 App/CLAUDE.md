@@ -19,6 +19,26 @@ personal, community, and professional.
 
 ---
 
+## Testing discipline
+
+Automated coordinate-tap testing on the emulator is unreliable (stale UI
+state, timing issues, false positives/negatives) and must not be treated as
+verification that a feature works. For any feature involving user input or
+multi-step flow (auth, onboarding, journaling, check-ins, community posting,
+practitioner registration):
+
+- Claude Code may use the emulator to sanity-check that a screen renders and
+  the app doesn't crash.
+- The **person** (not automated taps) must walk the real end-to-end flow
+  before a feature branch is considered done — e.g. actually registering,
+  confirming an email, logging in, answering onboarding questions, landing on
+  the right screen.
+- Do not report a flow as "working" based on automated taps alone. Say
+  clearly what was verified by Claude Code vs. what still needs human
+  verification.
+
+---
+
 ## Tech stack
 
 | Layer | Tool |
@@ -31,8 +51,10 @@ personal, community, and professional.
 | Realtime (community group) | Supabase Realtime |
 | Push notifications | OneSignal |
 | Payments | Stripe + Supabase Edge Function |
+| State management | Riverpod |
 | Dev environment | VS Code / Claude Code Desktop |
 | Version control | GitHub |
+| Package identifier | `au.org.grieffirstaid.gfaa` (Android + iOS, must match) |
 
 Do not introduce a different backend, state-management library, or major
 package without asking first (see Rule 7).
@@ -58,13 +80,19 @@ email verification.
 
 **1. Onboarding & Authentication**
 - Register/login with email verification, across the three roles above
+- Registration asks a required "preferred name" (shown anywhere the app
+  displays the user's name) and an optional "full name" (records only)
+- Forgot/reset password: user requests a reset link by email; opening it
+  deep-links back into the app (custom URL scheme
+  `au.org.grieffirstaid.gfaa://reset-password`) straight to a set-new-password
+  screen, bypassing normal auth/role routing
 - Users only, at first login, answer two multi-select questions (no separate
   category-selection step — the second question already covers loss context):
   - *"What kinds of support interest you?"* — safe space to share feelings,
     daily guidance, resources/practical tips, a friendly chat, joining a
     group, managing overwhelming emotions, referral to health services,
     learning more about grief, something else
-  - *"What brings you to Griefity?"* — general grief help, loss of
+  - *"What brings you to GFAA?"* — general grief help, loss of
     spouse/partner, loss of friend/family member, loss of parent, loss of
     child, loss during pregnancy, infertility/childlessness, loss of someone
     to suicide, caring for someone ageing
@@ -163,11 +191,13 @@ the ™ symbol below 8pt.
 
 ---
 
-## Data model starting point
+## Data model (live in Supabase — keep this section in sync with the actual migration)
 
-Draft only — confirm with the team before migrating. Core tables:
-
-- `profiles` (id, role, email, display_name, onboarding_answers jsonb, created_at)
+- `profiles` (id, role, email, display_name, full_name, onboarding_answers
+  jsonb, created_at) — `display_name` is the required "preferred name" shown
+  anywhere the app displays the user's name; `full_name` is optional,
+  records-only, never shown in the UI. Both are populated at sign-up from
+  auth metadata via the `handle_new_user` trigger.
 - `daily_messages` (id, body, sent_by_admin_id, created_at)
 - `user_messages` (id, user_id, message_id, saved, favourited, shared_at)
 - `journal_entries` (id, user_id, body, created_at, updated_at) — RLS: owner-only
@@ -181,12 +211,17 @@ Draft only — confirm with the team before migrating. Core tables:
 - `subscriptions` (id, practitioner_id, stripe_customer_id,
   stripe_subscription_id, status, current_period_end)
 
+If Claude Code changes the live schema, update this section in the same
+commit — this file must always describe what's actually in the database.
+
 ---
 
 ## Conventions
 
-- State management: **[confirm with team — Riverpod or Provider, pick one and stick to it]**
-- Folder structure: feature-first (e.g. `lib/features/journal/`, `lib/features/community/`)
+- State management: **Riverpod** (confirmed — see `lib/features/*/application/`).
+- Folder structure: feature-first (e.g. `lib/features/journal/`, `lib/features/community/`).
+- One feature = one branch, per Rule 4. Do not stack unrelated work on a
+  branch whose feature isn't finished and reviewed.
 - Never loosen a Supabase row-level security policy without explicitly
   asking first (Rule 7 — this is the kind of change that's hard to undo safely).
 - Payments and subscription status are the source of truth in Stripe;
@@ -194,3 +229,5 @@ Draft only — confirm with the team before migrating. Core tables:
 - No AI/LLM calls anywhere in this app — this was an explicit client
   decision, not a cost-saving default. Don't reintroduce it "to improve" a
   feature without asking.
+- When reporting progress, separate clearly what Claude Code verified itself
+  vs. what still needs the person to verify by hand (see Testing discipline above).

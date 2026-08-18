@@ -26,6 +26,20 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Catches the Supabase password-reset email link and reopens straight
+	     to the reset-password screen. See resetPasswordRedirectUrl in
+	     auth_repository.dart. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>au.org.grieffirstaid.gfaa</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>au.org.grieffirstaid.gfaa</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
