@@ -7,6 +7,7 @@ import 'features/auth/application/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/reset_password_screen.dart';
 import 'features/home/placeholder_home_screen.dart';
+import 'features/home/presentation/home_screen.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
 
 class GfaaApp extends StatelessWidget {
@@ -58,7 +59,7 @@ class _AuthGate extends ConsumerWidget {
             return switch (profile.role) {
               'admin' => const PlaceholderHomeScreen(title: 'Admin Dashboard'),
               'practitioner' => const PlaceholderHomeScreen(title: 'Practitioner Portal'),
-              _ => const PlaceholderHomeScreen(title: 'Home'),
+              _ => const HomeScreen(),
             };
           },
         );
