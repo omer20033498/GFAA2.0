@@ -116,8 +116,11 @@ email verification.
 - Realtime updates via Supabase Realtime.
 
 **6. Resources**
-- Admin-uploaded articles and videos, browsable/filterable by topic.
-- Files in Supabase Storage.
+- Scope simplified by the client during build: a single "Resources" row on
+  the user Home screen, opening the GFAA resources page
+  (grieffirstaid.au/resources/) in an external browser — same pattern as
+  the Training rows, not a browsable/filterable in-app list. No database
+  table, no admin management, no Supabase Storage.
 
 **7. Training**
 - Three static rows: For Individuals, For Workplaces, For Instructors.
