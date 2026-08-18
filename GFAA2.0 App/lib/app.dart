@@ -7,6 +7,7 @@ import 'features/auth/application/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/reset_password_screen.dart';
 import 'features/home/placeholder_home_screen.dart';
+import 'features/home/presentation/admin_home_screen.dart';
 import 'features/home/presentation/home_screen.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
 
@@ -57,7 +58,7 @@ class _AuthGate extends ConsumerWidget {
               return const OnboardingScreen();
             }
             return switch (profile.role) {
-              'admin' => const PlaceholderHomeScreen(title: 'Admin Dashboard'),
+              'admin' => const AdminHomeScreen(),
               'practitioner' => const PlaceholderHomeScreen(title: 'Practitioner Portal'),
               _ => const HomeScreen(),
             };

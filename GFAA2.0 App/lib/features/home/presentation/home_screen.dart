@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/home_menu_row.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../checkins/presentation/checkins_screen.dart';
 import '../../journal/presentation/journal_list_screen.dart';
+import '../../messages/presentation/latest_message_card.dart';
+import '../../messages/presentation/messages_screen.dart';
 import '../../training/presentation/training_screen.dart';
 
 /// The `user`-role home. Deliberately minimal — a menu of feature entry
@@ -30,7 +32,16 @@ class HomeScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            _HomeMenuRow(
+            const LatestMessageCard(),
+            HomeMenuRow(
+              icon: Icons.campaign_outlined,
+              label: 'Daily Messages',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MessagesScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeMenuRow(
               icon: Icons.edit_note,
               label: 'Journal',
               onTap: () => Navigator.of(context).push(
@@ -38,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 10),
-            _HomeMenuRow(
+            HomeMenuRow(
               icon: Icons.mood_outlined,
               label: 'Check-ins',
               onTap: () => Navigator.of(context).push(
@@ -46,7 +57,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 10),
-            _HomeMenuRow(
+            HomeMenuRow(
               icon: Icons.school_outlined,
               label: 'Training',
               onTap: () => Navigator.of(context).push(
@@ -54,49 +65,8 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const _HomeMenuRow(icon: Icons.auto_awesome_outlined, label: 'More coming soon'),
+            const HomeMenuRow(icon: Icons.auto_awesome_outlined, label: 'More coming soon'),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeMenuRow extends StatelessWidget {
-  const _HomeMenuRow({required this.icon, required this.label, this.onTap});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final enabled = onTap != null;
-    return Opacity(
-      opacity: enabled ? 1 : 0.5,
-      child: Material(
-        color: AppColors.coolWhite,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: const BoxDecoration(color: AppColors.softSage, shape: BoxShape.circle),
-                  child: Icon(icon, size: 18, color: AppColors.deepGreen),
-                ),
-                const SizedBox(width: 12),
-                Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyLarge)),
-                if (enabled)
-                  Icon(Icons.chevron_right, size: 18, color: AppColors.nearBlack.withValues(alpha: 0.4)),
-              ],
-            ),
-          ),
         ),
       ),
     );
