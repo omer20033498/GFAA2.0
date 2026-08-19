@@ -183,6 +183,14 @@ email verification.
 - Approve/reject/edit/remove/suspend practitioner listings; view
   active/inactive members, payment status, failed payments, export data.
 - Community moderation: approve/reject user posts, manage the group.
+- `AdminHomeScreen` now opens with a stat-tile grid (total users, live
+  practitioners, new users this week, check-ins this week, applications
+  awaiting review, posts awaiting approval) above the existing menu rows —
+  see `admin_dashboard_stats()` in the data model section below. The two
+  "awaiting" tiles link straight into the review/moderation screens they
+  describe. Deliberately just six plain counts, no charts — matches how
+  the rest of the admin screens work (fetch + pull-to-refresh, no
+  realtime).
 
 **10. Push Notifications**
 - OneSignal, triggered from a Supabase Edge Function on relevant events
@@ -264,6 +272,15 @@ the ™ symbol below 8pt.
   Real rows only start appearing once Stripe is wired up in a later branch.
 
 Resources (finalised feature 6) has no table — see that feature's note above.
+
+- `admin_dashboard_stats()` — SECURITY DEFINER Postgres function (not a
+  table), admin-only, returns aggregate counts only (total users, live
+  practitioners, pending applications, pending posts, new users this week,
+  check-ins this week) for the Admin Dashboard's stat tiles. Exists
+  because `profiles` and `checkins` SELECT are both owner-only with no
+  admin exception — this reads past that safely by returning only
+  numbers, never row content, rather than adding a general admin-read
+  policy on either table.
 
 If Claude Code changes the live schema, update this section in the same
 commit — this file must always describe what's actually in the database.

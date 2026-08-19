@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gfaa/features/admin/data/admin_stats.dart';
 import 'package:gfaa/features/auth/data/profile.dart';
 import 'package:gfaa/features/auth/presentation/login_screen.dart';
 import 'package:gfaa/features/checkins/data/mood.dart';
@@ -224,5 +225,22 @@ void main() {
       expect(const SpecialistFilter(query: 'sydney').matches(target), isTrue);
       expect(const SpecialistFilter(query: 'nonexistent').matches(target), isFalse);
     });
+  });
+
+  test('AdminStats.fromMap reads every field returned by admin_dashboard_stats()', () {
+    final stats = AdminStats.fromMap({
+      'total_users': 42,
+      'total_practitioners': 5,
+      'pending_practitioners': 2,
+      'pending_posts': 3,
+      'new_users_this_week': 7,
+      'checkins_this_week': 19,
+    });
+    expect(stats.totalUsers, 42);
+    expect(stats.totalPractitioners, 5);
+    expect(stats.pendingPractitioners, 2);
+    expect(stats.pendingPosts, 3);
+    expect(stats.newUsersThisWeek, 7);
+    expect(stats.checkinsThisWeek, 19);
   });
 }
