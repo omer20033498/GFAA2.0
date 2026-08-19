@@ -42,6 +42,13 @@ class CommunityScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't delete: $error")));
       }
+    } finally {
+      // The realtime feed stream doesn't reliably re-evict a row on DELETE
+      // (same gap noted in CommunityRepository.fetchPostsByStatus's own
+      // comment) -- invalidating forces an immediate fresh read for the
+      // person who just deleted it, rather than waiting on a manual
+      // refresh. Other viewers still get it live via the stream as normal.
+      ref.invalidate(communityFeedProvider);
     }
   }
 
