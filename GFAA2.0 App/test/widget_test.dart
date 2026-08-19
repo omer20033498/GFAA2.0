@@ -10,6 +10,11 @@ import 'package:gfaa/features/journal/presentation/journal_entry_screen.dart';
 import 'package:gfaa/features/messages/data/daily_message.dart';
 import 'package:gfaa/features/messages/data/message_with_state.dart';
 import 'package:gfaa/features/messages/presentation/message_filter.dart';
+import 'package:gfaa/features/practitioners/data/delivery_option.dart';
+import 'package:gfaa/features/practitioners/data/practitioner.dart';
+import 'package:gfaa/features/practitioners/data/profession.dart';
+import 'package:gfaa/features/practitioners/presentation/practitioner_application_screen.dart';
+import 'package:gfaa/features/practitioners/presentation/specialist_filter.dart';
 import 'package:gfaa/features/training/presentation/training_screen.dart';
 
 void main() {
@@ -57,6 +62,19 @@ void main() {
 
     expect(find.text('New post'), findsOneWidget);
     expect(find.text('Share something with the group…'), findsOneWidget);
+  });
+
+  testWidgets('PractitionerApplicationScreen renders the application form', (tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: MaterialApp(home: PractitionerApplicationScreen()),
+      ),
+    );
+
+    expect(find.text('Apply to be listed'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Full name'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Qualifications'), findsOneWidget);
+    expect(find.text('Submit application'), findsOneWidget);
   });
 
   group('Profile.effectiveDisplayName', () {
@@ -128,6 +146,83 @@ void main() {
     test('favourites returns only favourited messages', () {
       final result = applyMessageFilter(messages, MessageFilter.favourites);
       expect(result.map((item) => item.message.id), ['2', '3']);
+    });
+  });
+
+  test('PractitionerStatus.fromKey round-trips every status key stored in the database', () {
+    for (final status in PractitionerStatus.values) {
+      expect(PractitionerStatus.fromKey(status.name), status);
+    }
+  });
+
+  test('Profession.fromKey round-trips every profession key stored in the database', () {
+    for (final profession in Profession.values) {
+      expect(Profession.fromKey(profession.key), profession);
+    }
+  });
+
+  test('DeliveryOption.fromKey round-trips every delivery option key stored in the database', () {
+    for (final option in DeliveryOption.values) {
+      expect(DeliveryOption.fromKey(option.key), option);
+    }
+  });
+
+  group('SpecialistFilter', () {
+    Practitioner practitioner({
+      String id = 'p1',
+      String fullName = 'Dr. Jane Doe',
+      Profession profession = Profession.psychologist,
+      String? expertise,
+      String state = 'NSW',
+      String location = 'Sydney',
+      List<DeliveryOption> deliveryOptions = const [DeliveryOption.online],
+    }) {
+      return Practitioner(
+        id: id,
+        userId: 'u-$id',
+        fullName: fullName,
+        email: 'jane@example.com',
+        phone: '0400000000',
+        profession: profession,
+        qualifications: 'PhD Psychology',
+        expertise: expertise,
+        state: state,
+        location: location,
+        deliveryOptions: deliveryOptions,
+        website: null,
+        status: PractitionerStatus.approved,
+        createdAt: DateTime(2026, 1, 1),
+      );
+    }
+
+    test('empty filter matches everyone', () {
+      expect(const SpecialistFilter().matches(practitioner()), isTrue);
+    });
+
+    test('state filter excludes a different state', () {
+      const filter = SpecialistFilter(state: 'VIC');
+      expect(filter.matches(practitioner(state: 'NSW')), isFalse);
+      expect(filter.matches(practitioner(state: 'VIC')), isTrue);
+    });
+
+    test('profession filter excludes a different profession', () {
+      const filter = SpecialistFilter(profession: Profession.counsellor);
+      expect(filter.matches(practitioner(profession: Profession.psychologist)), isFalse);
+      expect(filter.matches(practitioner(profession: Profession.counsellor)), isTrue);
+    });
+
+    test('delivery option filter matches on any overlap', () {
+      const filter = SpecialistFilter(deliveryOptions: {DeliveryOption.telephone, DeliveryOption.online});
+      expect(filter.matches(practitioner(deliveryOptions: const [DeliveryOption.online])), isTrue);
+      expect(filter.matches(practitioner(deliveryOptions: const [DeliveryOption.faceToFace])), isFalse);
+    });
+
+    test('query matches name, profession, expertise, or location case-insensitively', () {
+      final target = practitioner(fullName: 'Dr. Jane Doe', expertise: 'Bereavement counselling');
+      expect(const SpecialistFilter(query: 'jane').matches(target), isTrue);
+      expect(const SpecialistFilter(query: 'BEREAVEMENT').matches(target), isTrue);
+      expect(const SpecialistFilter(query: 'sydney').matches(target), isTrue);
+      expect(const SpecialistFilter(query: 'nonexistent').matches(target), isFalse);
     });
   });
 }

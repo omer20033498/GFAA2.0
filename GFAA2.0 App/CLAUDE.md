@@ -80,6 +80,11 @@ email verification.
 
 **1. Onboarding & Authentication**
 - Register/login with email verification, across the three roles above
+- The login screen has a User/Practitioner toggle — it doesn't change how
+  login itself works (routing after sign-in is always driven by the
+  account's real `profiles.role`), it only changes where "Register" leads:
+  the normal register form for User, the practitioner application form
+  (finalised feature 8) for Practitioner
 - Registration asks a required "preferred name" (shown anywhere the app
   displays the user's name) and an optional "full name" (records only)
 - Forgot/reset password: user requests a reset link by email; opening it
@@ -127,18 +132,51 @@ email verification.
 - Each: short description + "Learn more" button linking out to the GFAA website.
 
 **8. Find a Grief Specialist**
-- Searchable, filterable directory of approved practitioners.
-- Filters: state, location, online availability, profession, grief support type.
-- Listing fields: name, profession, qualifications, expertise, location,
-  delivery options (face-to-face / online / phone), phone, email, website.
+- Searchable, filterable directory of approved + paying practitioners.
+- Filters: state, location, profession, delivery service (face-to-face /
+  online / telephone).
+- Listing fields: full name, profession, qualifications, expertise
+  (optional), state, location, delivery options, phone, email, website
+  (optional).
 - No in-app booking or messaging — users contact practitioners directly.
-- Practitioners pay $10 AUD/month via Stripe to stay listed.
-- Practitioner self-service portal: edit contact details/expertise, manage
-  subscription/payment, cancel.
-- Registration flow: application → admin review → approval email → payment →
-  listing goes live. Both approval AND active payment are required before a
-  listing appears — enforce this with a Postgres status check, not just
-  client-side logic.
+- Practitioners pay $10 AUD/month via Stripe to stay listed — **not yet
+  wired up** (client's explicit call, to avoid new infra before they have a
+  Stripe account). A listing cannot go live without an active subscription,
+  enforced in Postgres (`practitioner_has_active_subscription()`), so the
+  directory is genuinely empty until a follow-up branch adds real payment.
+- Registration flow, as actually built: the login screen's Practitioner tab
+  leads to an application form (not the normal register form) collecting
+  full name, email, password, phone, profession, qualifications, optional
+  expertise, state, location, delivery options, optional website.
+  Submitting creates the auth account immediately (same confirmation email
+  as normal registration — no separate "approved" email exists; the
+  practitioner just checks back by logging in) and a `pending` practitioner
+  application in one step, via the sign-up trigger reading the account's
+  metadata (not a separate authenticated insert — there's no session yet at
+  that point since email confirmation is required first). While
+  pending/rejected/suspended, logging in shows a status screen instead of
+  the normal user Home. Admin approving promotes `profiles.role` to
+  `practitioner` server-side (a trigger, not a client-side profiles write —
+  profiles UPDATE stays owner-only); rejecting/suspending demotes back to
+  `user`. That promotion is deliberately allowed through the
+  `prevent_role_self_escalation` guard (migration 0001) via a transaction-
+  local `app.bypass_role_guard` flag the trigger sets right before its own
+  write (migration 0010) — the guard still fully blocks a real client-side
+  role change; it only lets this one trusted server-side trigger through.
+  The login screen's User/Practitioner tabs also gate sign-in itself, not
+  just post-login routing: an approved practitioner (`profiles.role ==
+  'practitioner'`) is rejected with an inline message if they try the User
+  tab, and an account with no practitioner application at all is rejected
+  on the Practitioner tab — both cases sign the session back out rather
+  than letting them in and routing them away.
+  Practitioner Portal covers full self-service editing (name, phone,
+  profession, qualifications, expertise, state, location, delivery
+  options, website) plus a separate account-email change (Supabase's own
+  confirm-by-link flow) and a Subscription section — currently a status
+  placeholder plus disabled "Update payment details" / "Cancel
+  subscription" buttons, since Stripe isn't wired up yet. Once Stripe
+  lands, add: real subscription creation/webhook, and wire those two
+  buttons to it.
 
 **9. Admin Dashboard**
 - Manage users, daily messages, resources, training content.
@@ -210,12 +248,22 @@ the ™ symbol below 8pt.
   trigger based on the author's role, not by the client
 - `community_comments` (id, post_id, author_id, author_display_name, body,
   created_at)
-- `resources` (id, title, type [article/video], url_or_storage_path, category, created_at)
-- `practitioners` (id, user_id, name, profession, qualifications, expertise[],
-  state, location, delivery_options[], phone, email, website, status
-  [pending/approved/rejected/suspended], created_at)
+- `practitioners` (id, user_id, full_name, email, phone, profession
+  [psychologist/counsellor/psychotherapist/social_worker/grief_educator/other],
+  qualifications, expertise, state, location, delivery_options[]
+  [face_to_face/online/phone], website, status
+  [pending/approved/rejected/suspended], created_at) — status is set
+  server-side (protect_practitioner_status trigger); approving/suspending
+  syncs profiles.role via sync_practitioner_role trigger. Rows are created
+  only via the sign-up trigger (handle_new_user reading sign-up metadata),
+  never a direct client insert.
 - `subscriptions` (id, practitioner_id, stripe_customer_id,
-  stripe_subscription_id, status, current_period_end)
+  stripe_subscription_id, status, current_period_end) — placeholder table,
+  RLS enabled with **no policies at all** (fully locked down); visibility is
+  only ever checked indirectly via `practitioner_has_active_subscription()`.
+  Real rows only start appearing once Stripe is wired up in a later branch.
+
+Resources (finalised feature 6) has no table — see that feature's note above.
 
 If Claude Code changes the live schema, update this section in the same
 commit — this file must always describe what's actually in the database.

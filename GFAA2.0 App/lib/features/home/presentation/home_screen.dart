@@ -9,6 +9,7 @@ import '../../community/presentation/community_screen.dart';
 import '../../journal/presentation/journal_list_screen.dart';
 import '../../messages/presentation/latest_message_card.dart';
 import '../../messages/presentation/messages_screen.dart';
+import '../../practitioners/presentation/specialist_directory_screen.dart';
 import '../../training/presentation/training_screen.dart';
 
 /// The GFAA resources hub — per the user's call, this is a single outbound
@@ -93,6 +94,14 @@ class HomeScreen extends ConsumerWidget {
               icon: Icons.menu_book_outlined,
               label: 'Resources',
               onTap: () => _openResources(context),
+            ),
+            const SizedBox(height: 10),
+            HomeMenuRow(
+              icon: Icons.psychology_outlined,
+              label: 'Find a Specialist',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SpecialistDirectoryScreen()),
+              ),
             ),
             const SizedBox(height: 10),
             const HomeMenuRow(icon: Icons.auto_awesome_outlined, label: 'More coming soon'),

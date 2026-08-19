@@ -6,10 +6,13 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/application/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/reset_password_screen.dart';
-import 'features/home/placeholder_home_screen.dart';
 import 'features/home/presentation/admin_home_screen.dart';
 import 'features/home/presentation/home_screen.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
+import 'features/practitioners/application/practitioner_providers.dart';
+import 'features/practitioners/data/practitioner.dart';
+import 'features/practitioners/presentation/practitioner_application_status_screen.dart';
+import 'features/practitioners/presentation/practitioner_portal_screen.dart';
 
 class GfaaApp extends StatelessWidget {
   const GfaaApp({super.key});
@@ -54,14 +57,27 @@ class _AuthGate extends ConsumerWidget {
           error: (error, _) => _ErrorScreen(message: '$error'),
           data: (profile) {
             if (profile == null) return const _LoadingScreen();
-            if (profile.role == 'user' && !profile.hasCompletedOnboarding) {
-              return const OnboardingScreen();
-            }
-            return switch (profile.role) {
-              'admin' => const AdminHomeScreen(),
-              'practitioner' => const PlaceholderHomeScreen(title: 'Practitioner Portal'),
-              _ => const HomeScreen(),
-            };
+            if (profile.role == 'admin') return const AdminHomeScreen();
+            if (profile.role == 'practitioner') return const PractitionerPortalScreen();
+
+            // role == 'user' from here: either a normal user, or someone
+            // whose practitioner application is pending/rejected/suspended
+            // (an approved one promotes role to 'practitioner' server-side,
+            // see migration 0008 — so it wouldn't reach this branch).
+            final applicationAsync = ref.watch(myPractitionerApplicationProvider);
+            return applicationAsync.when(
+              loading: () => const _LoadingScreen(),
+              error: (error, _) => _ErrorScreen(message: '$error'),
+              data: (application) {
+                if (application != null && application.status != PractitionerStatus.approved) {
+                  return PractitionerApplicationStatusScreen(practitioner: application);
+                }
+                if (!profile.hasCompletedOnboarding) {
+                  return const OnboardingScreen();
+                }
+                return const HomeScreen();
+              },
+            );
           },
         );
       },

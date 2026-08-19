@@ -6,6 +6,7 @@ import '../../auth/application/auth_providers.dart';
 import '../../community/presentation/community_moderation_screen.dart';
 import '../../community/presentation/community_screen.dart';
 import '../../messages/presentation/admin_messages_screen.dart';
+import '../../practitioners/presentation/practitioner_review_screen.dart';
 
 /// The `admin`-role home. Same minimal, one-row-per-feature pattern as
 /// `HomeScreen` — grows as more admin capabilities land (resource uploads,
@@ -52,6 +53,14 @@ class AdminHomeScreen extends ConsumerWidget {
               label: 'Moderate Posts',
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const CommunityModerationScreen()),
+              ),
+            ),
+            const SizedBox(height: 10),
+            HomeMenuRow(
+              icon: Icons.psychology_outlined,
+              label: 'Practitioner Applications',
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PractitionerReviewScreen()),
               ),
             ),
             const SizedBox(height: 10),

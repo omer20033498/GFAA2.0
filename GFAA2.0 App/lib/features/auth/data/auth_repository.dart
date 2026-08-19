@@ -31,6 +31,19 @@ class AuthRepository {
     );
   }
 
+  /// Lower-level than [signUp] — for a sign-up that needs metadata beyond
+  /// just preferred/full name (e.g. a practitioner application; see
+  /// PractitionerRepository.applyAsPractitioner and migration 0008's
+  /// handle_new_user trigger, which reads this metadata to also create a
+  /// pending practitioners row in the same transaction).
+  Future<void> signUpWithMetadata({
+    required String email,
+    required String password,
+    required Map<String, dynamic> data,
+  }) {
+    return supabase.auth.signUp(email: email, password: password, data: data);
+  }
+
   Future<void> signIn({required String email, required String password}) {
     return supabase.auth.signInWithPassword(email: email, password: password);
   }
@@ -50,5 +63,13 @@ class AuthRepository {
   /// state, i.e. right after the user opens the reset-password email link.
   Future<void> updatePassword(String newPassword) {
     return supabase.auth.updateUser(UserAttributes(password: newPassword));
+  }
+
+  /// Doesn't take effect immediately — Supabase sends a confirmation link
+  /// to the new address first (its own built-in "secure email change"
+  /// flow), same mechanism as sign-up confirmation. The login email only
+  /// actually changes once that link is opened.
+  Future<void> updateEmail(String newEmail) {
+    return supabase.auth.updateUser(UserAttributes(email: newEmail));
   }
 }
