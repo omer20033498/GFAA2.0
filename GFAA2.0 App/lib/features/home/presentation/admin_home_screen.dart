@@ -9,6 +9,7 @@ import '../../community/presentation/community_moderation_screen.dart';
 import '../../community/presentation/community_screen.dart';
 import '../../messages/presentation/admin_messages_screen.dart';
 import '../../practitioners/presentation/practitioner_review_screen.dart';
+import '../../support/presentation/bug_reports_screen.dart';
 
 /// The `admin`-role home. Same minimal, one-row-per-feature pattern as
 /// `HomeScreen` — grows as more admin capabilities land (resource uploads,
@@ -74,6 +75,13 @@ class AdminHomeScreen extends ConsumerWidget {
                         MaterialPageRoute(builder: (_) => const CommunityModerationScreen()),
                       ),
                     ),
+                    StatTile(
+                      value: stats.openBugReports,
+                      label: 'Open bug reports',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const BugReportsScreen()),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -107,6 +115,14 @@ class AdminHomeScreen extends ConsumerWidget {
                 label: 'Practitioner Applications',
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const PractitionerReviewScreen()),
+                ),
+              ),
+              const SizedBox(height: 10),
+              HomeMenuRow(
+                icon: Icons.bug_report_outlined,
+                label: 'Bug Reports',
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const BugReportsScreen()),
                 ),
               ),
               const SizedBox(height: 10),

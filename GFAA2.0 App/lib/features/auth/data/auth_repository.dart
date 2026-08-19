@@ -78,8 +78,11 @@ class AuthRepository {
     );
   }
 
-  /// Only valid while the session is in `AuthChangeEvent.passwordRecovery`
-  /// state, i.e. right after the user opens the reset-password email link.
+  /// Works for any active session, not just a password-recovery one — used
+  /// both by ResetPasswordScreen (right after opening the recovery email
+  /// link) and ProfileAccountScreen (a normal logged-in user changing their
+  /// password directly). Supabase's `updateUser` doesn't distinguish where
+  /// the session came from, only that it's currently valid.
   Future<void> updatePassword(String newPassword) {
     return supabase.auth.updateUser(UserAttributes(password: newPassword));
   }
@@ -90,5 +93,17 @@ class AuthRepository {
   /// actually changes once that link is opened.
   Future<void> updateEmail(String newEmail) {
     return supabase.auth.updateUser(UserAttributes(email: newEmail));
+  }
+
+  /// Permanently deletes the signed-in user's account (Profile & Account
+  /// screen's "Delete account"). The client SDK has no self-delete method —
+  /// Supabase's user-deletion API needs the service-role key, never exposed
+  /// to the app — so this calls a SECURITY DEFINER Postgres function
+  /// (`delete_own_account()`, migration 0013) that deletes the caller's own
+  /// `auth.users` row and nothing else. Every feature table references
+  /// `auth.users` with `on delete cascade`, so this one call also wipes
+  /// their journal entries, check-ins, posts, etc. **Irreversible.**
+  Future<void> deleteOwnAccount() {
+    return supabase.rpc('delete_own_account');
   }
 }

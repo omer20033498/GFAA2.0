@@ -214,7 +214,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.offWhite),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                               )
                             : const Text('Create account'),
                       ),
@@ -234,7 +234,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: AppColors.nearBlack.withValues(alpha: 0.12)),
+                          side: const BorderSide(color: AppColors.border),
                         ),
                         onPressed: _isGoogleSubmitting ? null : _signInWithGoogle,
                         icon: _isGoogleSubmitting

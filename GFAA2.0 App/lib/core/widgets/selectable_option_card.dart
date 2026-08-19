@@ -41,7 +41,7 @@ class SelectableOptionCard extends StatelessWidget {
                 Icon(
                   selected ? Icons.check_circle : Icons.circle_outlined,
                   size: 20,
-                  color: selected ? AppColors.deepGreen : AppColors.nearBlack.withValues(alpha: 0.35),
+                  color: selected ? AppColors.deepGreen : AppColors.secondaryText,
                 ),
                 const SizedBox(width: 12),
                 Expanded(

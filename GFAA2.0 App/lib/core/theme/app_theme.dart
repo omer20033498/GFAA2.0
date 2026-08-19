@@ -9,13 +9,28 @@ import 'app_colors.dart';
 /// serif headings; warm, open subheads) so screens don't need to change
 /// again once the real font files land.
 ThemeData buildAppTheme() {
-  final colorScheme = ColorScheme.fromSeed(
-    seedColor: AppColors.sageGreen,
-    brightness: Brightness.light,
+  // Explicit ColorScheme rather than ColorScheme.fromSeed — the seed
+  // algorithm generates its own tonal palette for slots we don't set
+  // directly (secondaryContainer, tertiary, outline, etc.), and from a
+  // green seed that algorithm tends to drift toward blue/violet, which is
+  // exactly the "bluish/lavender" cast the client asked to remove. Pinning
+  // every slot to our own palette keeps the whole app on-brand, including
+  // default Material widgets we haven't explicitly styled.
+  const colorScheme = ColorScheme.light(
     surface: AppColors.offWhite,
-    primary: AppColors.sageGreen,
-    secondary: AppColors.deepGreen,
     onSurface: AppColors.nearBlack,
+    primary: AppColors.deepGreen,
+    onPrimary: Colors.white,
+    primaryContainer: AppColors.softSage,
+    onPrimaryContainer: AppColors.deepGreen,
+    secondary: AppColors.sageGreen,
+    onSecondary: Colors.white,
+    secondaryContainer: AppColors.softSage,
+    onSecondaryContainer: AppColors.deepGreen,
+    tertiary: AppColors.sageGreen,
+    onTertiary: Colors.white,
+    outline: AppColors.border,
+    outlineVariant: AppColors.border,
   );
 
   const headingColor = AppColors.deepGreen;
@@ -52,7 +67,7 @@ ThemeData buildAppTheme() {
       fontSize: 12,
       letterSpacing: 0.6,
       fontWeight: FontWeight.w700,
-      color: bodyColor.withValues(alpha: 0.7),
+      color: AppColors.secondaryText,
     ),
   );
 
@@ -73,10 +88,21 @@ ThemeData buildAppTheme() {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.deepGreen,
-        foregroundColor: AppColors.offWhite,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: AppColors.deepGreen.withValues(alpha: 0.4),
+        disabledForegroundColor: Colors.white.withValues(alpha: 0.8),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         textStyle: const TextStyle(fontWeight: FontWeight.w500, letterSpacing: 0.2),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.deepGreen,
+        backgroundColor: AppColors.coolWhite,
+        side: const BorderSide(color: AppColors.deepGreen),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -91,5 +117,6 @@ ThemeData buildAppTheme() {
       ),
       helperMaxLines: 2,
     ),
+    dividerTheme: const DividerThemeData(color: AppColors.border, space: 1),
   );
 }

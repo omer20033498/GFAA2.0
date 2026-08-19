@@ -31,4 +31,14 @@ class ProfileRepository {
         .update({'onboarding_answers': answers})
         .eq('id', userId);
   }
+
+  /// Profile & Account screen — the "preferred name" shown anywhere the app
+  /// displays the user's name. Not the same as the auth email (see
+  /// AuthRepository.updateEmail for that).
+  Future<void> updateDisplayName({required String userId, required String displayName}) async {
+    final updated = await supabase.from('profiles').update({'display_name': displayName}).eq('id', userId).select();
+    if (updated.isEmpty) {
+      throw StateError("Couldn't update your name.");
+    }
+  }
 }

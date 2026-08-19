@@ -16,6 +16,7 @@ import 'package:gfaa/features/practitioners/data/practitioner.dart';
 import 'package:gfaa/features/practitioners/data/profession.dart';
 import 'package:gfaa/features/practitioners/presentation/practitioner_application_screen.dart';
 import 'package:gfaa/features/practitioners/presentation/specialist_filter.dart';
+import 'package:gfaa/features/support/data/bug_report.dart';
 import 'package:gfaa/features/training/presentation/training_screen.dart';
 
 void main() {
@@ -235,6 +236,7 @@ void main() {
       'pending_posts': 3,
       'new_users_this_week': 7,
       'checkins_this_week': 19,
+      'open_bug_reports': 4,
     });
     expect(stats.totalUsers, 42);
     expect(stats.totalPractitioners, 5);
@@ -242,5 +244,12 @@ void main() {
     expect(stats.pendingPosts, 3);
     expect(stats.newUsersThisWeek, 7);
     expect(stats.checkinsThisWeek, 19);
+    expect(stats.openBugReports, 4);
+  });
+
+  test('BugReportStatus.fromKey round-trips every status key stored in the database', () {
+    for (final status in BugReportStatus.values) {
+      expect(BugReportStatus.fromKey(status.key), status);
+    }
   });
 }

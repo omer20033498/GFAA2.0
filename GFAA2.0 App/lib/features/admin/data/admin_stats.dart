@@ -6,6 +6,7 @@ class AdminStats {
     required this.pendingPosts,
     required this.newUsersThisWeek,
     required this.checkinsThisWeek,
+    required this.openBugReports,
   });
 
   factory AdminStats.fromMap(Map<String, dynamic> map) {
@@ -17,6 +18,7 @@ class AdminStats {
       pendingPosts: asInt('pending_posts'),
       newUsersThisWeek: asInt('new_users_this_week'),
       checkinsThisWeek: asInt('checkins_this_week'),
+      openBugReports: asInt('open_bug_reports'),
     );
   }
 
@@ -26,4 +28,5 @@ class AdminStats {
   final int pendingPosts;
   final int newUsersThisWeek;
   final int checkinsThisWeek;
+  final int openBugReports;
 }

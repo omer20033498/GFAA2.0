@@ -32,7 +32,7 @@ class GfaaBottomNav extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.offWhite,
-        border: Border(top: BorderSide(color: AppColors.softSage.withValues(alpha: 0.6))),
+        border: const Border(top: BorderSide(color: AppColors.border)),
       ),
       child: SafeArea(
         top: false,
@@ -58,7 +58,7 @@ class GfaaBottomNav extends StatelessWidget {
                         child: Icon(
                           item.icon,
                           size: 22,
-                          color: selected ? AppColors.deepGreen : AppColors.nearBlack.withValues(alpha: 0.45),
+                          color: selected ? AppColors.deepGreen : AppColors.secondaryText,
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -67,7 +67,7 @@ class GfaaBottomNav extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                          color: selected ? AppColors.deepGreen : AppColors.nearBlack.withValues(alpha: 0.45),
+                          color: selected ? AppColors.deepGreen : AppColors.secondaryText,
                         ),
                       ),
                     ],

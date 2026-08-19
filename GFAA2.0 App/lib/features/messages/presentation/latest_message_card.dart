@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_card.dart';
 import '../application/message_providers.dart';
 import 'message_actions_row.dart';
 import 'messages_screen.dart';
@@ -25,9 +26,8 @@ class LatestMessageCard extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: AppColors.coolWhite, borderRadius: BorderRadius.circular(12)),
+      child: AppCard(
+        borderRadius: 12,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

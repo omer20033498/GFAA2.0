@@ -5,20 +5,26 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/leaf_branch.dart';
 import '../../../core/widgets/mountain_footer.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../support/presentation/report_bug_sheet.dart';
+import 'about_gfaa_screen.dart';
+import 'privacy_policy_screen.dart';
+import 'profile_account_screen.dart';
+import 'terms_of_use_screen.dart';
 
 /// Slide-over profile panel — reachable from anywhere in the `user`
 /// experience via the bottom nav's Profile item (see `UserShell`), a
-/// standard `Scaffold.drawer`, not a fifth screen. The five menu rows
-/// (Profile & Account, About GFAA, Terms of Use, Privacy Policy, Report a
-/// Bug) are visual-only for now — where each should actually lead is a
-/// separate, deliberately deferred decision.
+/// standard `Scaffold.drawer`, not a fifth screen.
 class ProfileDrawer extends ConsumerWidget {
   const ProfileDrawer({super.key});
 
-  void _comingSoon(BuildContext context, String label) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label — coming soon')),
-    );
+  void _push(BuildContext context, Widget screen) {
+    // Capture the Navigator before popping the drawer closed — `context`
+    // may be unmounted immediately after `pop()`, so look it up once and
+    // reuse the captured NavigatorState rather than calling
+    // `Navigator.of(context)` a second time.
+    final navigator = Navigator.of(context);
+    navigator.pop();
+    navigator.push(MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
@@ -67,31 +73,38 @@ class ProfileDrawer extends ConsumerWidget {
             _DrawerRow(
               icon: Icons.person_outline,
               label: 'Profile & Account',
-              onTap: () => _comingSoon(context, 'Profile & Account'),
+              onTap: () => _push(context, const ProfileAccountScreen()),
             ),
             const Divider(height: 1, indent: 24, endIndent: 24),
             _DrawerRow(
               icon: Icons.info_outline,
               label: 'About GFAA',
-              onTap: () => _comingSoon(context, 'About GFAA'),
+              onTap: () => _push(context, const AboutGfaaScreen()),
             ),
             const Divider(height: 1, indent: 24, endIndent: 24),
             _DrawerRow(
               icon: Icons.description_outlined,
               label: 'Terms of Use',
-              onTap: () => _comingSoon(context, 'Terms of Use'),
+              onTap: () => _push(context, const TermsOfUseScreen()),
             ),
             const Divider(height: 1, indent: 24, endIndent: 24),
             _DrawerRow(
               icon: Icons.verified_user_outlined,
               label: 'Privacy Policy',
-              onTap: () => _comingSoon(context, 'Privacy Policy'),
+              onTap: () => _push(context, const PrivacyPolicyScreen()),
             ),
             const Divider(height: 1, indent: 24, endIndent: 24),
             _DrawerRow(
               icon: Icons.bug_report_outlined,
               label: 'Report a Bug',
-              onTap: () => _comingSoon(context, 'Report a Bug'),
+              onTap: () {
+                // Same capture-before-pop reasoning as `_push` — reuse the
+                // Navigator's own (still-mounted) context for the sheet
+                // rather than the drawer's context, which is about to close.
+                final navigator = Navigator.of(context);
+                navigator.pop();
+                showReportBugSheet(navigator.context);
+              },
             ),
             const Spacer(),
             const MountainFooter(),
@@ -139,7 +152,7 @@ class _DrawerRow extends StatelessWidget {
             ),
             const SizedBox(width: 14),
             Expanded(child: Text(label, style: Theme.of(context).textTheme.bodyLarge)),
-            Icon(Icons.chevron_right, size: 18, color: AppColors.nearBlack.withValues(alpha: 0.4)),
+            Icon(Icons.chevron_right, size: 18, color: AppColors.secondaryText),
           ],
         ),
       ),

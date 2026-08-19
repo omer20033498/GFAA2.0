@@ -221,19 +221,28 @@ generic Material/iOS styling — the Figma prototype is a structural reference
 only, not a visual spec to copy exactly. Keep the UI clean, calm, and
 interactive.
 
-**Colour palette** (muted, a little greyed — grief "can suck the colour from
-life"; green is soothing/stress-reducing; the neon is a rare accent, never a
-button colour):
+**Colour palette** (updated 2026-08-19 — client flagged the original tones
+as reading too cool/clinical; see `lib/core/theme/app_colors.dart` for the
+canonical definitions and why `ColorScheme.fromSeed` was replaced with an
+explicit `ColorScheme`. Green is soothing/stress-reducing; the neon is a
+rare accent, never a button colour):
 
 | Name | Hex | Use |
 |---|---|---|
-| Off-white | `#F0F1EB` | Primary background |
-| Cool white | `#F4F6FC` | Secondary background/cards |
-| Sage green | `#A9C1A9` | Primary brand colour |
-| Soft sage | `#DAE4D7` | Light fills/backgrounds |
-| Deep green | `#355438` | Dark accent, headings on light bg |
-| Near-black | `#192227` | Text ("Dark Grey Azure") |
+| Off-white | `#F3F6F0` | Primary background |
+| Cool white | `#F7F7F2` | Secondary background/cards |
+| Sage green | `#8FAF9A` | Secondary brand colour |
+| Soft sage | `#DCE8D8` | Icon circles, selected states, light fills |
+| Deep green | `#355C45` | Primary brand/action colour — buttons, headings, selected nav |
+| Near-black | `#1F2923` | Main text |
+| Secondary text | `#5F6962` | Muted text/icons — use this, not `nearBlack` at reduced opacity |
+| Border | `#D8DED7` | Borders and dividers |
 | Neon yellow | `#E6FE54` | Rare accent only — highlight a word/moment, **never** UI buttons |
+
+Visual hierarchy, client's own framing: warm off-white background → very
+subtle neutral cards → sage accents → deep green for important actions →
+dark charcoal text. No gradients, shadows, bright/saturated colours, or a
+new visual style — "quiet, warm, safe, natural, reassuring, human."
 
 **Typography**
 - **Perpetua** (serif) — headings, reflective/long-form text (journaling
@@ -264,17 +273,41 @@ step") to replace the earlier placeholder-styled screens. Done so far:
   slide-over drawer (`ProfileDrawer`) via `Scaffold.drawer`, per the
   reference design.
 - **Profile drawer**: avatar circle + decorative leaf sprig, "Welcome
-  back, {name}", five menu rows (Profile & Account, About GFAA, Terms of
-  Use, Privacy Policy, Report a Bug) that are **visual-only for now** —
-  where each should actually lead is a deliberately deferred decision —
-  a mountain/sun decorative footer, app version, and a Log Out button
-  that replaces the old AppBar logout icon.
+  back, {name}", a mountain/sun decorative footer, app version, and a Log
+  Out button that replaces the old AppBar logout icon. All five menu rows
+  are now wired to real screens (2026-08-19 follow-up):
+  - **Profile & Account** (`profile_account_screen.dart`) — edit preferred
+    name and email (reuses `AuthRepository.updateEmail`, same
+    confirm-by-link flow as the practitioner portal) and password (reuses
+    `AuthRepository.updatePassword` — works for any active session, not
+    just a password-recovery one). A "Danger zone" section lets the user
+    permanently delete their own account via `delete_own_account()`
+    (migration 0013, SECURITY DEFINER — the client SDK has no self-delete
+    method, that needs the service-role key). Every feature table
+    references `auth.users` with `on delete cascade`, so this one call
+    wipes the account and all of their data. **Irreversible** — test with
+    a disposable account.
+  - **About GFAA** and **Privacy Policy** — placeholder copy Claude Code
+    drafted, clearly marked as draft in-app; GFAA can revise anytime.
+  - **Terms of Use** — the client's own provided text (adapted from a
+    template that said "Griefity" throughout — replaced with "GFAA" for
+    consistency; flag if that wasn't intended).
+  - **Report a Bug** — a modal sheet (not a full screen), posts to a new
+    `bug_reports` table rather than a `mailto:` link — Claude Code's
+    recommendation when asked, since it doesn't depend on the device
+    having a mail client configured, gives admin a persistent/auditable
+    queue, and matches every other admin workflow in this app (fetch +
+    review screen) rather than being the one feature that works
+    differently. Surfaced in `AdminHomeScreen` as both a stat tile ("Open
+    bug reports") and a menu row, linking to `BugReportsScreen`
+    (mark-resolved, no delete — resolved reports just stop counting as
+    open).
 - **Home**: greeting ("Good morning, {name}") + today's-message preview +
-  a 2-column grid of feature cards (Journal, Check-ins, Community,
-  Training, Resources, Find a Specialist). Check-ins/Community are grid
-  entries here for discoverability but actually live on the bottom bar —
-  tapping them nudges the user there rather than pushing a duplicate
-  screen.
+  a 2×2 grid of feature cards (Journal, Resources, Training, Find a
+  Specialist). Check-ins and Community were removed from the grid per
+  client follow-up (2026-08-19) — both already live on the bottom bar, so
+  a grid entry was redundant; the grid now only covers what's *not* a
+  bottom-bar tab.
 - **Login/Register**: pill-shaped fields with leading icons, a headline
   with one word underlined in the brand's rare neon-yellow accent,
   "Continue with Google" (with a hand-drawn approximation of Google's
@@ -328,14 +361,22 @@ step") to replace the earlier placeholder-styled screens. Done so far:
 
 Resources (finalised feature 6) has no table — see that feature's note above.
 
+- `bug_reports` (id, user_id, email, body, status [open/resolved],
+  created_at) — owner can insert only (no owner select — this is a
+  one-way "send to GFAA", not a "my reports" list); admin can select/update
+  all. See finalised feature 1's Profile drawer note above for why this
+  exists instead of a `mailto:` link.
 - `admin_dashboard_stats()` — SECURITY DEFINER Postgres function (not a
   table), admin-only, returns aggregate counts only (total users, live
   practitioners, pending applications, pending posts, new users this week,
-  check-ins this week) for the Admin Dashboard's stat tiles. Exists
-  because `profiles` and `checkins` SELECT are both owner-only with no
-  admin exception — this reads past that safely by returning only
-  numbers, never row content, rather than adding a general admin-read
-  policy on either table.
+  check-ins this week, open bug reports) for the Admin Dashboard's stat
+  tiles. Exists because `profiles` and `checkins` SELECT are both
+  owner-only with no admin exception — this reads past that safely by
+  returning only numbers, never row content, rather than adding a general
+  admin-read policy on either table.
+- `delete_own_account()` — SECURITY DEFINER Postgres function, deletes the
+  caller's own `auth.users` row (and, via cascade, everything else tied to
+  it). See finalised feature 1's Profile drawer note above.
 
 If Claude Code changes the live schema, update this section in the same
 commit — this file must always describe what's actually in the database.

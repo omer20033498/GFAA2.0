@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/gfaa_logo.dart';
 import '../../../core/widgets/mountain_footer.dart';
 import '../../auth/application/auth_providers.dart';
@@ -102,26 +103,10 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 _FeatureCard(
-                  icon: Icons.mood_outlined,
-                  label: 'Check-ins',
-                  description: 'Track your\nemotions',
-                  onTap: () {
-                    // Check-ins is its own bottom-nav tab now — nudge there
-                    // instead of pushing a second copy of the same screen.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Use the Check-in tab below')),
-                    );
-                  },
-                ),
-                _FeatureCard(
-                  icon: Icons.groups_outlined,
-                  label: 'Community',
-                  description: 'Connect and\nshare',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Use the Community tab below')),
-                    );
-                  },
+                  icon: Icons.menu_book_outlined,
+                  label: 'Resources',
+                  description: 'Articles, videos\nand tools',
+                  onTap: () => _openResources(context),
                 ),
                 _FeatureCard(
                   icon: Icons.school_outlined,
@@ -130,12 +115,6 @@ class HomeScreen extends ConsumerWidget {
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const TrainingScreen()),
                   ),
-                ),
-                _FeatureCard(
-                  icon: Icons.menu_book_outlined,
-                  label: 'Resources',
-                  description: 'Articles, videos\nand tools',
-                  onTap: () => _openResources(context),
                 ),
                 _FeatureCard(
                   icon: Icons.favorite_border,
@@ -170,30 +149,22 @@ class _FeatureCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    return Material(
-      color: AppColors.coolWhite,
-      borderRadius: BorderRadius.circular(14),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(color: AppColors.softSage, shape: BoxShape.circle),
-                child: Icon(icon, size: 20, color: AppColors.deepGreen),
-              ),
-              const SizedBox(height: 12),
-              Text(label, style: textTheme.titleMedium),
-              const SizedBox(height: 2),
-              Text(description, style: textTheme.labelSmall),
-            ],
+    return AppCard(
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(color: AppColors.softSage, shape: BoxShape.circle),
+            child: Icon(icon, size: 20, color: AppColors.deepGreen),
           ),
-        ),
+          const SizedBox(height: 12),
+          Text(label, style: textTheme.titleMedium),
+          const SizedBox(height: 2),
+          Text(description, style: textTheme.labelSmall),
+        ],
       ),
     );
   }

@@ -17,7 +17,7 @@ InputDecoration authFieldDecoration({
 
   return InputDecoration(
     hintText: hint,
-    prefixIcon: Icon(icon, size: 20, color: AppColors.nearBlack.withValues(alpha: 0.4)),
+    prefixIcon: Icon(icon, size: 20, color: AppColors.secondaryText),
     suffixIcon: suffixIcon,
     filled: true,
     fillColor: AppColors.coolWhite,
