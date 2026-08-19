@@ -71,6 +71,13 @@ class _CommunityPostScreenState extends ConsumerState<CommunityPostScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't delete: $error")));
       }
+    } finally {
+      // Same realtime-doesn't-reliably-re-evict-on-DELETE gap as posts
+      // (see invalidateAfterPostRemoved) — force a fresh read for whoever
+      // just deleted it rather than waiting on a manual refresh. Deleting
+      // a comment doesn't add anything new to the stream, so there's no
+      // duplicate-on-insert risk here the way there is for posts.
+      ref.invalidate(postCommentsProvider(widget.post.id));
     }
   }
 

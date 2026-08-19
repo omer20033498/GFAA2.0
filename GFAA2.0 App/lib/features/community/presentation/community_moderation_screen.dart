@@ -17,14 +17,6 @@ class CommunityModerationScreen extends ConsumerStatefulWidget {
 class _CommunityModerationScreenState extends ConsumerState<CommunityModerationScreen> {
   PostStatus _tab = PostStatus.pending;
 
-  /// A post moves between tabs (e.g. pending -> approved), so every
-  /// mutation invalidates all three lists rather than just the current one.
-  void _refreshAll() {
-    for (final status in PostStatus.values) {
-      ref.invalidate(postsByStatusProvider(status));
-    }
-  }
-
   Future<void> _approve(CommunityPost post) async {
     try {
       await ref.read(communityRepositoryProvider).setPostStatus(id: post.id, status: PostStatus.approved);
@@ -33,7 +25,12 @@ class _CommunityModerationScreenState extends ConsumerState<CommunityModerationS
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't approve: $error")));
       }
     } finally {
-      _refreshAll();
+      // Approving moves a post *into* the feed's realtime filter, same
+      // shape as a fresh create — its live stream picks that up on its
+      // own, so this only needs to refresh the moderation lists (see
+      // invalidateAfterCreate's doc comment for why invalidating the feed
+      // too would risk showing it twice).
+      invalidateAfterCreate(ref);
     }
   }
 
@@ -57,7 +54,11 @@ class _CommunityModerationScreenState extends ConsumerState<CommunityModerationS
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't reject: $error")));
       }
     } finally {
-      _refreshAll();
+      // Rejecting only ever happens from Pending, which was never in the
+      // feed to begin with, but invalidating it too is a harmless no-op
+      // refresh (nothing new enters, so no duplicate risk) — kept for
+      // consistency in case that ever changes.
+      invalidateAfterPostRemoved(ref);
     }
   }
 
@@ -81,7 +82,10 @@ class _CommunityModerationScreenState extends ConsumerState<CommunityModerationS
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't delete: $error")));
       }
     } finally {
-      _refreshAll();
+      // A delete can remove a post that was visible in the feed (if it was
+      // approved), so the feed needs invalidating too, not just the
+      // moderation lists.
+      invalidateAfterPostRemoved(ref);
     }
   }
 

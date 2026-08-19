@@ -18,13 +18,7 @@ class CommunityScreen extends ConsumerWidget {
     );
     if (posted != true || !context.mounted) return;
     final isAdmin = ref.read(profileProvider).value?.role == 'admin';
-    // The Moderate Posts screen (a different screen, possibly not even
-    // mounted right now) fetches rather than watching a live stream, so it
-    // never learns about a post created from here on its own — an admin's
-    // post lands straight in Approved, a user's in Pending, so invalidate
-    // both rather than only whichever this author's role would produce.
-    ref.invalidate(postsByStatusProvider(PostStatus.approved));
-    ref.invalidate(postsByStatusProvider(PostStatus.pending));
+    invalidateAfterCreate(ref);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(isAdmin ? 'Posted.' : "Submitted — it'll appear once approved.")),
     );
@@ -50,12 +44,9 @@ class CommunityScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Couldn't delete: $error")));
       }
     } finally {
-      // The realtime feed stream doesn't reliably re-evict a row on DELETE
-      // (same gap noted in CommunityRepository.fetchPostsByStatus's own
-      // comment) -- invalidating forces an immediate fresh read for the
-      // person who just deleted it, rather than waiting on a manual
-      // refresh. Other viewers still get it live via the stream as normal.
-      ref.invalidate(communityFeedProvider);
+      // A delete from this screen needs to reach Moderate Posts too, not
+      // just this feed — see invalidateAfterPostRemoved's doc comment.
+      invalidateAfterPostRemoved(ref);
     }
   }
 
