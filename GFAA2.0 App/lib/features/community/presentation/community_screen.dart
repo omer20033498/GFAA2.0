@@ -18,6 +18,13 @@ class CommunityScreen extends ConsumerWidget {
     );
     if (posted != true || !context.mounted) return;
     final isAdmin = ref.read(profileProvider).value?.role == 'admin';
+    // The Moderate Posts screen (a different screen, possibly not even
+    // mounted right now) fetches rather than watching a live stream, so it
+    // never learns about a post created from here on its own — an admin's
+    // post lands straight in Approved, a user's in Pending, so invalidate
+    // both rather than only whichever this author's role would produce.
+    ref.invalidate(postsByStatusProvider(PostStatus.approved));
+    ref.invalidate(postsByStatusProvider(PostStatus.pending));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(isAdmin ? 'Posted.' : "Submitted — it'll appear once approved.")),
     );
