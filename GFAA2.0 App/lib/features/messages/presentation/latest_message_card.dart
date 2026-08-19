@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../application/message_providers.dart';
 import 'message_actions_row.dart';
+import 'messages_screen.dart';
 
 /// A preview of the single most recent daily message, for the Home screen —
 /// save/favourite/share right there, no need to open the full Daily
@@ -40,7 +41,17 @@ class LatestMessageCard extends ConsumerWidget {
               style: const TextStyle(fontSize: 16, height: 1.6, letterSpacing: 0.1, color: AppColors.nearBlack),
             ),
             const SizedBox(height: 4),
-            MessageActionsRow(item: latest),
+            Row(
+              children: [
+                Expanded(child: MessageActionsRow(item: latest)),
+                TextButton(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const MessagesScreen()),
+                  ),
+                  child: const Text('View all'),
+                ),
+              ],
+            ),
           ],
         ),
       ),

@@ -7,7 +7,7 @@ import 'features/auth/application/auth_providers.dart';
 import 'features/auth/presentation/login_screen.dart';
 import 'features/auth/presentation/reset_password_screen.dart';
 import 'features/home/presentation/admin_home_screen.dart';
-import 'features/home/presentation/home_screen.dart';
+import 'features/home/presentation/user_shell.dart';
 import 'features/onboarding/presentation/onboarding_screen.dart';
 import 'features/practitioners/application/practitioner_providers.dart';
 import 'features/practitioners/data/practitioner.dart';
@@ -75,7 +75,7 @@ class _AuthGate extends ConsumerWidget {
                 if (!profile.hasCompletedOnboarding) {
                   return const OnboardingScreen();
                 }
-                return const HomeScreen();
+                return const UserShell();
               },
             );
           },

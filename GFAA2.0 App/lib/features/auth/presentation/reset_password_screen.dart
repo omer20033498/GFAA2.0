@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/gfaa_logo.dart';
+import '../../../core/widgets/password_field.dart';
 import '../application/auth_providers.dart';
 
 /// Shown when the app is reopened via the password-reset email link — see
@@ -87,18 +88,16 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+            PasswordField(
               controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'New password'),
+              labelText: 'New password',
               validator: (value) =>
                   (value == null || value.length < 6) ? 'Password must be at least 6 characters' : null,
             ),
             const SizedBox(height: 12),
-            TextFormField(
+            PasswordField(
               controller: _confirmController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Confirm password'),
+              labelText: 'Confirm password',
               validator: (value) => value != _passwordController.text ? 'Passwords do not match' : null,
             ),
             if (_errorMessage != null) ...[

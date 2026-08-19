@@ -91,6 +91,18 @@ email verification.
   deep-links back into the app (custom URL scheme
   `au.org.grieffirstaid.gfaa://reset-password`) straight to a set-new-password
   screen, bypassing normal auth/role routing
+- "Continue with Google" on the login screen's **User tab only** (not
+  Practitioner — Google can't supply profession/qualifications/etc., so
+  that path stays email/password + the application form). One button
+  covers both login and first-time sign-up, since Supabase creates the
+  account automatically on first use. Requires a Google Cloud OAuth
+  client + Supabase's Google provider to be configured (external
+  account setup, not app code) before it actually works — reuses the
+  same custom-URL-scheme redirect mechanism as password reset, just a
+  different path (`au.org.grieffirstaid.gfaa://login-callback`), so no
+  native platform config was needed beyond what password reset already
+  registered.
+- Every password field has a show/hide toggle (`core/widgets/password_field.dart`).
 - Users only, at first login, answer two multi-select questions (no separate
   category-selection step — the second question already covers loss context):
   - *"What kinds of support interest you?"* — safe space to share feelings,
@@ -237,6 +249,49 @@ UI microtext should feel like "practical care," not a medical app.
 
 **Logo**: "Grief FIRST AID™" — standard stacked lockup or horizontal. Drop
 the ™ symbol below 8pt.
+
+**Visual redesign, in progress (started 2026-08-19)**: the client is
+supplying real mockups screen-by-screen (not all at once — "edit step by
+step") to replace the earlier placeholder-styled screens. Done so far:
+- **Navigation**: `user`-role accounts (not admin, not practitioner — see
+  `UserShell` in `lib/features/home/presentation/`) now get a persistent
+  bottom bar (Home / Check-in / Community / Profile) on *every* screen,
+  client's explicit call ("Option B"). Home/Check-in/Community are real
+  tabs, each with its own nested `Navigator` so pushing into e.g. Journal
+  or Training from Home still shows a back arrow and keeps that tab's
+  history (Instagram/WhatsApp-style) — only switching between the three
+  main tabs has no back arrow. Profile isn't a fourth tab; it opens a
+  slide-over drawer (`ProfileDrawer`) via `Scaffold.drawer`, per the
+  reference design.
+- **Profile drawer**: avatar circle + decorative leaf sprig, "Welcome
+  back, {name}", five menu rows (Profile & Account, About GFAA, Terms of
+  Use, Privacy Policy, Report a Bug) that are **visual-only for now** —
+  where each should actually lead is a deliberately deferred decision —
+  a mountain/sun decorative footer, app version, and a Log Out button
+  that replaces the old AppBar logout icon.
+- **Home**: greeting ("Good morning, {name}") + today's-message preview +
+  a 2-column grid of feature cards (Journal, Check-ins, Community,
+  Training, Resources, Find a Specialist). Check-ins/Community are grid
+  entries here for discoverability but actually live on the bottom bar —
+  tapping them nudges the user there rather than pushing a duplicate
+  screen.
+- **Login/Register**: pill-shaped fields with leading icons, a headline
+  with one word underlined in the brand's rare neon-yellow accent,
+  "Continue with Google" (with a hand-drawn approximation of Google's
+  four-colour "G" — no real asset pipeline for third-party logos exists
+  yet), decorative leaf sprigs in the bottom corners. The reference design
+  didn't show the User/Practitioner audience toggle or the required
+  preferred-name field — both are functionally necessary (see finalised
+  features 1 and 8) so they were kept, just restyled to match.
+- Decorative illustrations (leaf branches, the mountain/sun motif) are
+  hand-drawn via `CustomPainter` (`lib/core/widgets/leaf_branch.dart`,
+  `mountain_footer.dart`) rather than image assets, since no vector
+  illustration export exists — approximate the reference's *feel*, not a
+  pixel-exact match.
+- **Not yet redesigned**: Check-ins, Community, Journal, Daily Messages,
+  Find a Specialist, Training, and both admin/practitioner-portal screens
+  still use the earlier placeholder styling. Update this section as each
+  lands.
 
 ---
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/widgets/gfaa_logo.dart';
+import '../../../core/widgets/password_field.dart';
 import '../../auth/presentation/verify_email_screen.dart';
 import '../application/practitioner_providers.dart';
 import 'practitioner_listing_fields.dart';
@@ -102,10 +103,9 @@ class _PractitionerApplicationScreenState extends ConsumerState<PractitionerAppl
                         (value == null || !value.contains('@')) ? 'Enter a valid email' : null,
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
+                  PasswordField(
                     controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    labelText: 'Password',
                     validator: (value) =>
                         (value == null || value.length < 6) ? 'Password must be at least 6 characters' : null,
                   ),

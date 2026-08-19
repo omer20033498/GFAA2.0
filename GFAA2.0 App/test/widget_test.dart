@@ -26,8 +26,8 @@ void main() {
       ),
     );
 
-    expect(find.text('Welcome back'), findsOneWidget);
-    expect(find.widgetWithText(TextFormField, 'Email'), findsOneWidget);
+    expect(find.text('Log in to your account'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'Email address'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, 'Password'), findsOneWidget);
     expect(find.widgetWithText(ElevatedButton, 'Log in'), findsOneWidget);
   });

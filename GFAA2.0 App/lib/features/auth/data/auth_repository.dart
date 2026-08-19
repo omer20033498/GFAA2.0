@@ -7,6 +7,11 @@ import '../../../core/supabase/supabase_client.dart';
 /// straight to the reset-password screen.
 const resetPasswordRedirectUrl = 'au.org.grieffirstaid.gfaa://reset-password';
 
+/// Same custom scheme as [resetPasswordRedirectUrl] (already registered on
+/// both platforms), different path — Supabase redirects here after a
+/// Google sign-in/sign-up completes in the browser.
+const googleAuthRedirectUrl = 'au.org.grieffirstaid.gfaa://login-callback';
+
 class AuthRepository {
   Stream<AuthState> get authStateChanges => supabase.auth.onAuthStateChange;
 
@@ -46,6 +51,20 @@ class AuthRepository {
 
   Future<void> signIn({required String email, required String password}) {
     return supabase.auth.signInWithPassword(email: email, password: password);
+  }
+
+  /// Opens Google's sign-in in the browser; Supabase creates the account
+  /// automatically on first use (via the same `handle_new_user` trigger as
+  /// email/password sign-up) — one call covers both login and sign-up,
+  /// there's no separate "register with Google" step. The actual result
+  /// arrives later as an [authStateChanges] event once the browser redirects
+  /// back via [googleAuthRedirectUrl]; this only reports whether the browser
+  /// launched, not whether sign-in succeeded.
+  Future<void> signInWithGoogle() {
+    return supabase.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: googleAuthRedirectUrl,
+    );
   }
 
   Future<void> signOut() {
