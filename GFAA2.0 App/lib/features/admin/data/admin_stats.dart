@@ -7,6 +7,7 @@ class AdminStats {
     required this.newUsersThisWeek,
     required this.checkinsThisWeek,
     required this.openBugReports,
+    required this.pendingPaymentPractitioners,
   });
 
   factory AdminStats.fromMap(Map<String, dynamic> map) {
@@ -19,6 +20,7 @@ class AdminStats {
       newUsersThisWeek: asInt('new_users_this_week'),
       checkinsThisWeek: asInt('checkins_this_week'),
       openBugReports: asInt('open_bug_reports'),
+      pendingPaymentPractitioners: asInt('pending_payment_practitioners'),
     );
   }
 
@@ -29,4 +31,9 @@ class AdminStats {
   final int newUsersThisWeek;
   final int checkinsThisWeek;
   final int openBugReports;
+
+  /// Approved but not paid up — passed review, but not actually live in
+  /// the public directory yet. Distinct from [totalPractitioners], which
+  /// is approved *and* paid.
+  final int pendingPaymentPractitioners;
 }

@@ -237,6 +237,7 @@ void main() {
       'new_users_this_week': 7,
       'checkins_this_week': 19,
       'open_bug_reports': 4,
+      'pending_payment_practitioners': 6,
     });
     expect(stats.totalUsers, 42);
     expect(stats.totalPractitioners, 5);
@@ -245,6 +246,7 @@ void main() {
     expect(stats.newUsersThisWeek, 7);
     expect(stats.checkinsThisWeek, 19);
     expect(stats.openBugReports, 4);
+    expect(stats.pendingPaymentPractitioners, 6);
   });
 
   test('BugReportStatus.fromKey round-trips every status key stored in the database', () {

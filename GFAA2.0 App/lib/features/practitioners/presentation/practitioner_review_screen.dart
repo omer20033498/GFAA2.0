@@ -11,14 +11,19 @@ import '../data/csv_download/csv_download.dart';
 import '../data/practitioner.dart';
 
 class PractitionerReviewScreen extends ConsumerStatefulWidget {
-  const PractitionerReviewScreen({super.key});
+  const PractitionerReviewScreen({super.key, this.initialTab = PractitionerStatus.pending});
+
+  /// Lets a caller land directly on a specific tab — e.g. the Admin
+  /// Dashboard's payment stat opens straight to Approved, since that's
+  /// where an unpaid-but-approved listing actually lives.
+  final PractitionerStatus initialTab;
 
   @override
   ConsumerState<PractitionerReviewScreen> createState() => _PractitionerReviewScreenState();
 }
 
 class _PractitionerReviewScreenState extends ConsumerState<PractitionerReviewScreen> {
-  PractitionerStatus _tab = PractitionerStatus.pending;
+  late PractitionerStatus _tab = widget.initialTab;
 
   /// A listing moves between tabs (e.g. pending -> approved), so every
   /// mutation invalidates all four lists rather than just the current one.

@@ -8,6 +8,7 @@ import '../../auth/application/auth_providers.dart';
 import '../../community/presentation/community_moderation_screen.dart';
 import '../../community/presentation/community_screen.dart';
 import '../../messages/presentation/admin_messages_screen.dart';
+import '../../practitioners/data/practitioner.dart';
 import '../../practitioners/presentation/practitioner_review_screen.dart';
 import '../../support/presentation/bug_reports_screen.dart';
 
@@ -82,6 +83,15 @@ class AdminHomeScreen extends ConsumerWidget {
                         MaterialPageRoute(builder: (_) => const BugReportsScreen()),
                       ),
                     ),
+                    StatTile(
+                      value: stats.pendingPaymentPractitioners,
+                      label: 'Pending/failed payments',
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const PractitionerReviewScreen(initialTab: PractitionerStatus.approved),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -125,8 +135,6 @@ class AdminHomeScreen extends ConsumerWidget {
                   MaterialPageRoute(builder: (_) => const BugReportsScreen()),
                 ),
               ),
-              const SizedBox(height: 10),
-              const HomeMenuRow(icon: Icons.auto_awesome_outlined, label: 'More coming soon'),
             ],
           ),
         ),

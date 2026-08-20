@@ -197,12 +197,16 @@ email verification.
 - Community moderation: approve/reject user posts, manage the group.
 - `AdminHomeScreen` now opens with a stat-tile grid (total users, live
   practitioners, new users this week, check-ins this week, applications
-  awaiting review, posts awaiting approval) above the existing menu rows —
-  see `admin_dashboard_stats()` in the data model section below. The two
-  "awaiting" tiles link straight into the review/moderation screens they
-  describe. Deliberately just six plain counts, no charts — matches how
-  the rest of the admin screens work (fetch + pull-to-refresh, no
-  realtime).
+  awaiting review, posts awaiting approval, open bug reports, pending/
+  failed practitioner payments) above the existing menu rows — see
+  `admin_dashboard_stats()` in the data model section below. The
+  "awaiting"/"pending" tiles link straight into the review/moderation
+  screens they describe — the payments one opens
+  `PractitionerReviewScreen`'s Approved tab specifically (via a new
+  `initialTab` constructor param), since that's where an approved-but-
+  unpaid listing actually sits. Deliberately just plain counts, no
+  charts — matches how the rest of the admin screens work (fetch +
+  pull-to-refresh, no realtime).
 
 **10. Push Notifications**
 - OneSignal, triggered from a Supabase Edge Function on relevant events
@@ -369,11 +373,16 @@ Resources (finalised feature 6) has no table — see that feature's note above.
 - `admin_dashboard_stats()` — SECURITY DEFINER Postgres function (not a
   table), admin-only, returns aggregate counts only (total users, live
   practitioners, pending applications, pending posts, new users this week,
-  check-ins this week, open bug reports) for the Admin Dashboard's stat
-  tiles. Exists because `profiles` and `checkins` SELECT are both
-  owner-only with no admin exception — this reads past that safely by
-  returning only numbers, never row content, rather than adding a general
-  admin-read policy on either table.
+  check-ins this week, open bug reports, pending/failed practitioner
+  payments) for the Admin Dashboard's stat tiles. Exists because
+  `profiles` and `checkins` SELECT are both owner-only with no admin
+  exception — this reads past that safely by returning only numbers,
+  never row content, rather than adding a general admin-read policy on
+  either table. "Pending/failed payments" is `status = 'approved' and
+  not practitioner_has_active_subscription(id)` — the exact complement of
+  "live practitioners" (`approved and` that same check) — will just equal
+  every approved practitioner until Stripe is wired up, since none of
+  them can be paid yet; that's expected, not a bug.
 - `delete_own_account()` — SECURITY DEFINER Postgres function, deletes the
   caller's own `auth.users` row (and, via cascade, everything else tied to
   it). See finalised feature 1's Profile drawer note above.
