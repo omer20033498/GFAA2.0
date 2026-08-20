@@ -5,7 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/gfaa_logo.dart';
-import '../../../core/widgets/mountain_footer.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../journal/presentation/journal_list_screen.dart';
 import '../../messages/presentation/latest_message_card.dart';
@@ -56,30 +55,17 @@ class HomeScreen extends ConsumerWidget {
           children: [
             const GfaaLogo(height: 28),
             const SizedBox(height: 24),
-            Stack(
-              clipBehavior: Clip.none,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Positioned(
-                  top: -10,
-                  right: -24,
-                  child: SizedBox(width: 160, child: MountainFooter(height: 90)),
+                Text(
+                  '${_greeting()}, ${profile?.effectiveDisplayName ?? ''}',
+                  style: textTheme.headlineMedium,
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 60),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '${_greeting()}, ${profile?.effectiveDisplayName ?? ''}',
-                        style: textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 8),
-                      Text("You're not alone.\nWe're here to walk with you.", style: textTheme.bodyMedium),
-                      const SizedBox(height: 6),
-                      Container(width: 36, height: 3, color: AppColors.neonYellow),
-                    ],
-                  ),
-                ),
+                const SizedBox(height: 8),
+                Text("You're not alone.\nWe're here to walk with you.", style: textTheme.bodyMedium),
+                const SizedBox(height: 6),
+                Container(width: 36, height: 3, color: AppColors.neonYellow),
               ],
             ),
             const SizedBox(height: 24),
