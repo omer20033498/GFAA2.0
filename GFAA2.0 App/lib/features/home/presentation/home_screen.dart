@@ -55,17 +55,34 @@ class HomeScreen extends ConsumerWidget {
           children: [
             const GfaaLogo(height: 28),
             const SizedBox(height: 24),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            Stack(
+              clipBehavior: Clip.none,
               children: [
-                Text(
-                  '${_greeting()}, ${profile?.effectiveDisplayName ?? ''}',
-                  style: textTheme.headlineMedium,
+                const Positioned(
+                  top: -10,
+                  right: -24,
+                  child: Image(
+                    image: AssetImage('assets/branding/home_illustration.png'),
+                    width: 110,
+                    height: 110,
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text("You're not alone.\nWe're here to walk with you.", style: textTheme.bodyMedium),
-                const SizedBox(height: 6),
-                Container(width: 36, height: 3, color: AppColors.neonYellow),
+                Padding(
+                  padding: const EdgeInsets.only(right: 60),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${_greeting()}, ${profile?.effectiveDisplayName ?? ''}',
+                        style: textTheme.headlineMedium,
+                      ),
+                      const SizedBox(height: 8),
+                      Text("You're not alone.\nWe're here to walk with you.", style: textTheme.bodyMedium),
+                      const SizedBox(height: 6),
+                      Container(width: 36, height: 3, color: AppColors.neonYellow),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 24),
