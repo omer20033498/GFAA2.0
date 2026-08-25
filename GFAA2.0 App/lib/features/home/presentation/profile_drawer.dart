@@ -39,83 +39,96 @@ class ProfileDrawer extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
-              child: Row(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: const BoxDecoration(color: AppColors.softSage, shape: BoxShape.circle),
-                    child: const Icon(Icons.person_outline, size: 30, color: AppColors.deepGreen),
-                  ),
-                  const Expanded(child: LeafBranch()),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
-              child: profileAsync.when(
-                loading: () => const SizedBox(height: 32),
-                error: (error, _) => const SizedBox.shrink(),
-                data: (profile) => profile == null
-                    ? const SizedBox.shrink()
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            // Header + menu rows scroll independently of the footer below —
+            // on a short screen the fixed footer (illustration, version,
+            // Log Out) was overflowing when there wasn't room left for it
+            // after a `Spacer()` inside a single non-scrolling Column.
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
+                      child: Row(
                         children: [
-                          Text('Welcome back,', style: textTheme.bodyMedium),
-                          Text(profile.effectiveDisplayName, style: textTheme.headlineSmall),
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: const BoxDecoration(color: AppColors.softSage, shape: BoxShape.circle),
+                            child: const Icon(Icons.person_outline, size: 30, color: AppColors.deepGreen),
+                          ),
+                          const Expanded(child: LeafBranch()),
                         ],
                       ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+                      child: profileAsync.when(
+                        loading: () => const SizedBox(height: 32),
+                        error: (error, _) => const SizedBox.shrink(),
+                        data: (profile) => profile == null
+                            ? const SizedBox.shrink()
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Welcome back,', style: textTheme.bodyMedium),
+                                  Text(profile.effectiveDisplayName, style: textTheme.headlineSmall),
+                                ],
+                              ),
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    _DrawerRow(
+                      icon: Icons.person_outline,
+                      label: 'Profile & Account',
+                      onTap: () => _push(context, const ProfileAccountScreen()),
+                    ),
+                    const Divider(height: 1, indent: 24, endIndent: 24),
+                    _DrawerRow(
+                      icon: Icons.info_outline,
+                      label: 'About GFAA',
+                      onTap: () => _push(context, const AboutGfaaScreen()),
+                    ),
+                    const Divider(height: 1, indent: 24, endIndent: 24),
+                    _DrawerRow(
+                      icon: Icons.description_outlined,
+                      label: 'Terms of Use',
+                      onTap: () => _push(context, const TermsOfUseScreen()),
+                    ),
+                    const Divider(height: 1, indent: 24, endIndent: 24),
+                    _DrawerRow(
+                      icon: Icons.verified_user_outlined,
+                      label: 'Privacy Policy',
+                      onTap: () => _push(context, const PrivacyPolicyScreen()),
+                    ),
+                    const Divider(height: 1, indent: 24, endIndent: 24),
+                    _DrawerRow(
+                      icon: Icons.bug_report_outlined,
+                      label: 'Report a Bug',
+                      onTap: () {
+                        // Same capture-before-pop reasoning as `_push` —
+                        // reuse the Navigator's own (still-mounted) context
+                        // for the sheet rather than the drawer's context,
+                        // which is about to close.
+                        final navigator = Navigator.of(context);
+                        navigator.pop();
+                        showReportBugSheet(navigator.context);
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Divider(height: 1),
-            _DrawerRow(
-              icon: Icons.person_outline,
-              label: 'Profile & Account',
-              onTap: () => _push(context, const ProfileAccountScreen()),
-            ),
-            const Divider(height: 1, indent: 24, endIndent: 24),
-            _DrawerRow(
-              icon: Icons.info_outline,
-              label: 'About GFAA',
-              onTap: () => _push(context, const AboutGfaaScreen()),
-            ),
-            const Divider(height: 1, indent: 24, endIndent: 24),
-            _DrawerRow(
-              icon: Icons.description_outlined,
-              label: 'Terms of Use',
-              onTap: () => _push(context, const TermsOfUseScreen()),
-            ),
-            const Divider(height: 1, indent: 24, endIndent: 24),
-            _DrawerRow(
-              icon: Icons.verified_user_outlined,
-              label: 'Privacy Policy',
-              onTap: () => _push(context, const PrivacyPolicyScreen()),
-            ),
-            const Divider(height: 1, indent: 24, endIndent: 24),
-            _DrawerRow(
-              icon: Icons.bug_report_outlined,
-              label: 'Report a Bug',
-              onTap: () {
-                // Same capture-before-pop reasoning as `_push` — reuse the
-                // Navigator's own (still-mounted) context for the sheet
-                // rather than the drawer's context, which is about to close.
-                final navigator = Navigator.of(context);
-                navigator.pop();
-                showReportBugSheet(navigator.context);
-              },
-            ),
-            const Spacer(),
-            const MountainFooter(),
-            const SizedBox(height: 12),
+            const MountainFooter(height: 80),
+            const SizedBox(height: 8),
             Text(
               'App Version 1.0.0',
               textAlign: TextAlign.center,
               style: textTheme.labelSmall,
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
               child: OutlinedButton.icon(
                 onPressed: () => ref.read(authRepositoryProvider).signOut(),
                 icon: const Icon(Icons.logout, size: 18),
